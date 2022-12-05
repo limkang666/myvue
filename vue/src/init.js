@@ -1,7 +1,10 @@
 import { compileToFunction } from "./compiler/index.js"
+import { mountComponent } from "./lifecycle.js"
+import { nextTick } from "./observe/watcher.js"
 import { initState } from "./state"
 
 export function initMinxin(Vue) {
+    // debugger
     Vue.prototype._init = function (options) {
         const vm = this
         vm.$options = options
@@ -29,8 +32,9 @@ export function initMinxin(Vue) {
                 const render = compileToFunction(template)
                 ops.render = render
             }
-            console.log(template);
+            //console.log(template);
         }
+        mountComponent(vm,el)
     }
 }
 

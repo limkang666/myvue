@@ -10,24 +10,43 @@
 <script src="./vue.js"></script>
 
 <body>
-    <div id="app">
-        {{name}}
-        <span>
-            {{age}}
-        </span>
+    <div id="app" class="class" style="color:red">
+        {{fullname}}
     </div>
     <script>
         const vm = new Vue({
             data() {
                 return {
                     name: "张三",
+                    lastName:"123",
                     age: 20,
-                    hobby: [1, 2, { name: 124 }]
+                    hobby: [1, 2, {
+                        name: 124
+                    }],
+                    arr:[0,{a:0}]
                 }
-
+            },
+            computed:{
+                fullname(){
+                    return this.name+this.lastName
+                }
+            },
+            watch:{
+                name(newval,oldval){
+                    console.log(newval,oldval);
+                }
             },
             el: "#app"
         })
+        setTimeout(()=>{
+            // debugger
+            // vm.arr.push({a:0})
+            vm.name=999
+            // vm.name="lish"
+            // vm.name="l2ish"
+            // vm.name="li3sh"
+            // vm.age="lish"
+        },1000)
     </script>
 </body>
 

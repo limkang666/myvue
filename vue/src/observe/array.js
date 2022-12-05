@@ -16,7 +16,7 @@ methods.forEach(method=>{
         switch(method){
             case "push":
             case "unshift":
-                console.log("chufa");
+                //console.log("chufa");
                 inserted = args
                 break;
             case "splice":
@@ -28,6 +28,7 @@ methods.forEach(method=>{
         if(inserted){
             this.__ob__.observeArray(inserted)
         }
+        this.__ob__.dep.notify()
         return res
     }
 })
