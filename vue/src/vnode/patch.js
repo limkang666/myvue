@@ -101,6 +101,40 @@ function updateChildren (el,oldChildren,newChildren){
     let newEndVnode = newChildren[oldEndIndex]
 
     while(oldStartIndex <= oldEndIndex && newStartIndex <= newEndIndex){
-        
+        if(isSameVNode(oldStartVnode,newStartVnode)){
+            patchVNode(oldStartVnode,newStartVnode)
+            oldStartVnode = oldChildren[++oldStartIndex]
+            newStartVnode = newChildren[++newStartIndex]
+        }else if(isSameVNode(oldEndVnode,newEndVnode)){
+            patchVNode(oldEndVnode,newStartVnode)
+            oldEndVnode = oldChildren[--oldEndIndex]
+            newEndVnode = newChildren[--newEndVnode]
+        }else if(isSameVNode(oldEndVnode,newStartVnode)){
+            patchVNode(oldEndVnode,newStartVnode)
+            el.insertBefore(oldEndVnode.el,newStartVnode.el)
+            oldEndVnode = oldChildren[--oldEndIndex]
+            newStartVnode = newChildren[++newStartIndex]
+
+        }else if(isSameVNode(oldStartVnode,newEndVnode)){
+            patchVNode(oldStartVnode,newEndVnode)
+            el.insertBefore(oldStartVnode.el,oldEndVnode.el.nextSibling)
+            oldStartVnode = oldChildren[++oldStartIndex]
+            newEndVnode = newChildren[--newEndIndex]
+        }
+    }
+
+    if(newStartIndex <=newEndIndex){
+        for(let i = newStartIndex;i<=newEndIndex;i++){
+            let childEl = createElm(newChildren[i])
+
+            let anchor = newChildren[newEndIndex + 1] ?newChildren[newEndIndex+1].el : null
+            el.insertBefore(childEl,anchor)
+        }
+    }
+    if(oldStartIndex <=oldEndIndex){
+        for(let i = oldStartIndex;i<=oldEndIndex;i++){
+            let childEl = oldChildren[i].el
+            el.removeChild(childEl)
+        }
     }
 }
