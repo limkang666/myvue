@@ -25,7 +25,7 @@ function gen(node){
         let text = node.text
         text = text.replace(/\s/g,'')
         if(!defaultTagRE.test(text)){
-            return `_v(${text})`
+            return `_v(${JSON.stringify(text)})`
         }else{
             let tokens = []
             let match;
@@ -37,7 +37,7 @@ function gen(node){
                     tokens.push(JSON.stringify(text.slice(lastIndex,index)))
 
                 }
-                tokens.push(`_s(${match[1].trim()})`)
+                tokens.push(`_s(${JSON.stringify(match[1].trim())})`)
                 lastIndex = index + match[0].length
             }
             if(lastIndex < text.length){
@@ -58,8 +58,13 @@ function codeGen(ast) {
 }
 
 export function compileToFunction(template) {
-    let ast = parseHTML(template)
+    template = template.replace(/\n/g,'')
+    // setTimeout(()=>{
+
+        let ast = parseHTML(template)
+    // })
     let code = codeGen(ast);
+    // console.log(code,7);
     code = `with(this){return ${code}}`
     let render = new Function(code)
     return render
