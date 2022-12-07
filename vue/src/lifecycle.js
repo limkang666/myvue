@@ -5,14 +5,21 @@ import { patch } from "./vnode/patch"
 export function mountComponent(vm,el){
     vm.$el = el
     const updateComponent = () => {
-
         vm._update(vm._render())
     }
     let w = new Watcher(vm,updateComponent)
 }
 export function initLifecycle(Vue){
     Vue.prototype._update=function(vnode){
-        this.$el = patch(this.$el,vnode)
+        const vm = this
+        const el = vm.$el
+        const preVnode = vm._vnode
+        vm._vnode = vnode
+        if(preVnode){
+            patch(preVnode,vnode)
+        }else{
+            this.$el = patch(el,vnode)
+        }
     }
     Vue.prototype._render = function(){
         let vm = this

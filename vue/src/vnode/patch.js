@@ -112,7 +112,6 @@ function updateChildren (el,oldChildren,newChildren){
     let map = makeIndexByKey(oldChildren)
     // console.log(888);
     while(oldStartIndex <= oldEndIndex && newStartIndex <= newEndIndex){
-        debugger
         if(!oldStartVnode){
             oldStartVnode = oldChildren[++oldStartIndex]
         }else if(!oldEndVnode){
