@@ -112,7 +112,7 @@ function updateChildren (el,oldChildren,newChildren){
     let map = makeIndexByKey(oldChildren)
     // console.log(888);
     while(oldStartIndex <= oldEndIndex && newStartIndex <= newEndIndex){
-        debugger
+        // debugger
         if(!oldStartVnode){
             oldStartVnode = oldChildren[++oldStartIndex]
         }else if(!oldEndVnode){
@@ -127,7 +127,7 @@ function updateChildren (el,oldChildren,newChildren){
             newEndVnode = newChildren[--newEndVnode]
         }else if(isSameVNode(oldEndVnode,newStartVnode)){
             patchVNode(oldEndVnode,newStartVnode)
-            el.insertBefore(oldEndVnode.el,newStartVnode.el)
+            el.insertBefore(oldEndVnode.el,oldStartVnode.el)
             oldEndVnode = oldChildren[--oldEndIndex]
             newStartVnode = newChildren[++newStartIndex]
 

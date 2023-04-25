@@ -130,7 +130,7 @@
             let text = node.text;
             text = text.replace(/\s/g,'');
             if(!defaultTagRE.test(text)){
-                return `_v(${text})`
+                return `_v(${JSON.stringify(text)})`
             }else {
                 let tokens = [];
                 let match;
@@ -142,7 +142,7 @@
                         tokens.push(JSON.stringify(text.slice(lastIndex,index)));
 
                     }
-                    tokens.push(`_s(${match[1].trim()})`);
+                    tokens.push(`_s(${JSON.stringify(match[1].trim())})`);
                     lastIndex = index + match[0].length;
                 }
                 if(lastIndex < text.length){
@@ -163,8 +163,13 @@
     }
 
     function compileToFunction(template) {
-        let ast = parseHTML(template);
+        template = template.replace(/\n/g,'');
+        // setTimeout(()=>{
+
+            let ast = parseHTML(template);
+        // })
         let code = codeGen(ast);
+        // console.log(code,7);
         code = `with(this){return ${code}}`;
         let render = new Function(code);
         return render
@@ -201,18 +206,18 @@
     }
 
     let id = 0;
-    class Watcher{
-        constructor(vm,exprOrFn,option={},cb){
+    class Watcher {
+        constructor(vm, exprOrFn, option = {}, cb) {
             this.vm = vm;
             this.id = id++;
             // this.getter = fn
-            if(typeof exprOrFn === 'string'){
-                this.getter = function(){
+            if (typeof exprOrFn === 'string') {
+                this.getter = function () {
                     return vm[exprOrFn]
                 };
-            }else {
-                    this.getter=exprOrFn;
-                }
+            } else {
+                this.getter = exprOrFn;
+            }
             this.deps = [];
             this.cb = cb;
             this.user = option.user;
@@ -220,14 +225,14 @@
             this.dirty = option.lazy;
             this.lazy = option.lazy;
             this.renderWatcher = option;
-            this.oldVal = this.lazy?undefined : this.get();
-            
+            this.oldVal = this.lazy ? undefined : this.get();
+
         }
-        evaluate(){
+        evaluate() {
             this.value = this.get();
             this.dirty = false;
         }
-        get(){
+        get() {
             // Dep.target = this
             pushTarget(this);
             let value = this.getter.call(this.vm);
@@ -235,72 +240,73 @@
             popTarget();
             return value
         }
-        addDep(dep){
+        addDep(dep) {
             let id = dep.id;
-            if(!this.depIds.has(id)){
+            if (!this.depIds.has(id)) {
                 this.deps.push(dep);
                 dep.addSub(this);
                 this.depIds.add(id);
             }
         }
-        depend(){
+        depend() {
             let i = this.deps.length;
-            while(i--){
+            while (i--) {
                 this.deps[i].depend();
             }
         }
-        update(){
-            // this.get()
-            if(this.lazy){
-                // console.log(4);
+        update() {
+            if (this.lazy) {
                 this.dirty = true;
-            }else {
+            } else {
                 queueWatcher(this);
             }
         }
-        run(){
+        run() {
             let newVal = this.get();
-            if(this.user){
-                this.cb.call(this.vm,newVal,this.oldVal);
+            if (this.user) {
+                this.cb.call(this.vm, newVal, this.oldVal);
             }
         }
     }
     let has = {};
     let queue = [];
     let pending = false;
-    function flushSchedulerQueue(){
+
+    function flushSchedulerQueue() {
         let flushQueue = queue.slice(0);
         queue = [];
         has = {};
         pending = false;
-        flushQueue.forEach(q=>q.run());
+        flushQueue.forEach(q => q.run());
     }
-    function queueWatcher(wather){
+
+    function queueWatcher(wather) {
         const id = wather.id;
-        if(!has[id]){
+        if (!has[id]) {
             queue.push(wather);
             has[id] = true;
-            if(!pending){
-            nextTick(flushSchedulerQueue);
-             pending = true;
+            if (!pending) {
+                nextTick(flushSchedulerQueue);
+                pending = true;
             }
         }
     }
     let callbacks = [];
     let waiting = false;
-    function flushCallbacks(){
+
+    function flushCallbacks() {
         let cbs = callbacks.slice(0);
         waiting = true;
         callbacks = [];
-        cbs.forEach(cb=>cb());
+        cbs.forEach(cb => cb());
     }
-    function nextTick(cb){
+    function nextTick(cb) {
         callbacks.push(cb);
-        if(!waiting){
-            setTimeout(()=>{
+        if (!waiting) {
+            setTimeout(() => {
                 flushCallbacks();
-            },0);
-            waiting=true;
+            }, 0);
+            waiting = true;
         }
     }
 
@@ -338,6 +344,10 @@
         return vnode.el
     }
     function patchProps(el,oldProps,props){
+        // debugger
+        // console.log(oldProps,9);
+        oldProps = oldProps || {};
+        props = props || {};
         let oldStyles = oldProps.style || {};
         let newStyles = props.style || {};
         for(let key in oldStyles){
@@ -365,11 +375,9 @@
         if(isRealDom){
             const elm = oldVNode;
             const parentElm = elm.parentNode;
-
             let newEle = createElm(vnode);
             parentElm.insertBefore(newEle,elm.nextSibling);
             parentElm.removeChild(elm);
-            console.log(newEle);
             return newEle
         }else {
             return patchVNode(oldVNode,vnode)
@@ -377,6 +385,7 @@
     }
 
     function patchVNode(oldVNode,vnode){
+        // debugger
         if(!isSameVNode(oldVNode,vnode)){
             let el = createElm(vnode);
             oldVNode.el.parentNode.replaceChild(el,oldVNode.el);
@@ -388,13 +397,13 @@
                 el.textContent = vnode.text;
             }
         }
-
+    // debugger
         patchProps(el,oldVNode.data,vnode.data);
 
         let oldChildren = oldVNode.children || [];
         let newChildren = vnode.children || [];
 
-        if(oldChildren>0 && newChildren>0){
+        if(oldChildren.length>0 && newChildren.length>0){
             updateChildren(el,oldChildren,newChildren);
         }else if(newChildren.length>0){
             mountChildren(el,newChildren);
@@ -413,14 +422,81 @@
     }
 
     function updateChildren (el,oldChildren,newChildren){
+        let oldStartIndex = 0;
+        let newStartIndex = 0;
         let oldEndIndex = oldChildren.length -1;
-        newChildren.length -1;
+        let newEndIndex = newChildren.length -1;
 
-        oldChildren[0];
-        newChildren[0];
+        let oldStartVnode = oldChildren[0];
+        let newStartVnode = newChildren[0];
 
-        oldChildren[oldEndIndex];
-        newChildren[oldEndIndex];
+        let oldEndVnode = oldChildren[oldEndIndex];
+        let newEndVnode = newChildren[oldEndIndex];
+        function makeIndexByKey(children){
+            let map = {};
+            children.forEach((child,index)=>{
+                map[child.key]=index;
+            });
+            return map
+        } 
+        let map = makeIndexByKey(oldChildren);
+        // console.log(888);
+        while(oldStartIndex <= oldEndIndex && newStartIndex <= newEndIndex){
+            // debugger
+            if(!oldStartVnode){
+                oldStartVnode = oldChildren[++oldStartIndex];
+            }else if(!oldEndVnode){
+                oldEndVnode = oldChildren[--oldEndIndex];
+            }else if(isSameVNode(oldStartVnode,newStartVnode)){
+                patchVNode(oldStartVnode,newStartVnode);
+                oldStartVnode = oldChildren[++oldStartIndex];
+                newStartVnode = newChildren[++newStartIndex];
+            }else if(isSameVNode(oldEndVnode,newEndVnode)){
+                patchVNode(oldEndVnode,newStartVnode);
+                oldEndVnode = oldChildren[--oldEndIndex];
+                newEndVnode = newChildren[--newEndVnode];
+            }else if(isSameVNode(oldEndVnode,newStartVnode)){
+                patchVNode(oldEndVnode,newStartVnode);
+                el.insertBefore(oldEndVnode.el,oldStartVnode.el);
+                oldEndVnode = oldChildren[--oldEndIndex];
+                newStartVnode = newChildren[++newStartIndex];
+
+            }else if(isSameVNode(oldStartVnode,newEndVnode)){
+                patchVNode(oldStartVnode,newEndVnode);
+                el.insertBefore(oldStartVnode.el,oldEndVnode.el.nextSibling);
+                oldStartVnode = oldChildren[++oldStartIndex];
+                newEndVnode = newChildren[--newEndIndex];
+            }else {
+                let moveIndex = map[newStartVnode.key];
+                if(moveIndex !==undefined){
+                    let moveVNode = oldChildren[moveIndex];
+                    el.insertBefore(moveVNode.el,oldStartVnode.el);
+                    oldChildren[moveIndex] = undefined;
+                    patchVNode(moveVNode,newStartVnode);
+                }else {
+                    el.insertBefore(createElm(newStartVnode),oldStartVnode.el);
+                }
+                newStartVnode = newChildren[++newStartIndex];
+            }
+        }
+
+        if(newStartIndex <=newEndIndex){
+            for(let i = newStartIndex;i<=newEndIndex;i++){
+                let childEl = createElm(newChildren[i]);
+
+                let anchor = newChildren[newEndIndex + 1] ?newChildren[newEndIndex+1].el : null;
+                el.insertBefore(childEl,anchor);
+            }
+        }
+        if(oldStartIndex <=oldEndIndex){
+            for(let i = oldStartIndex;i<=oldEndIndex;i++){
+                if(oldChildren[i]){
+
+                    let childEl = oldChildren[i].el;
+                    el.removeChild(childEl);
+                }
+            }
+        }
     }
 
     function mountComponent(vm,el){
@@ -663,13 +739,50 @@
         };
     }
 
-    function Vue (options) {
+    function Vue(options) {
         this._init(options);
 
     }
     initStateMixin(Vue);
     initMinxin(Vue);
     initLifecycle(Vue);
+    let render1 = compileToFunction(`
+<ul>
+<li key='a'>1</li>
+<li key='b'>2</li>
+<li key='c'>3</li>
+<li key='d'>4</li>
+</ul>
+`);
+    let vm1 = new Vue({
+        data: {
+            name: 'af'
+        }
+    });
+    let preVnode = render1.call(vm1);
+
+    let el = createElm(preVnode);
+
+    // console.log(document.querySelector('body'),999);
+    document.querySelector('body').appendChild(el);
+
+    let render2 = compileToFunction(`
+<ul>
+<li key='d'>4</li>
+<li key='b'>2</li>
+<li key='c'>3</li>
+<li key='a'>1</li>
+</ul>
+`);
+    let vm2 = new Vue({
+        data: {
+            name: 'fa'
+        }
+    });
+    let nextVnode = render2.call(vm2);
+    setTimeout(() => {
+        patch(preVnode, nextVnode);
+    }, 1000);
 
     return Vue;
 

@@ -28,6 +28,8 @@ initLifecycle(Vue)
 let render1 = compileToFunction(`
 <ul>
 <li key='a'>1</li>
+<li key='b'>2</li>
+<li key='c'>3</li>
 <li key='d'>4</li>
 </ul>
 `)
@@ -46,6 +48,8 @@ document.querySelector('body').appendChild(el)
 let render2 = compileToFunction(`
 <ul>
 <li key='d'>4</li>
+<li key='b'>2</li>
+<li key='c'>3</li>
 <li key='a'>1</li>
 </ul>
 `)
