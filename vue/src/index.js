@@ -1,6 +1,7 @@
 import {
     compileToFunction
 } from "./compiler/index"
+import { initGlobalAPI } from "./globalAPI.js"
 import {
     initMinxin
 } from "./init"

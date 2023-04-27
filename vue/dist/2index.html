@@ -6,11 +6,26 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <script src="./vue.js"></script>
 </head>
 <!-- <script src="./vue.js"></script> -->
 
 <body>
+    <div id="app">
+        <span>{{name}}</span>
+    </div>
 </body>
-
+<script>
+const vm = new Vue({
+    el:"#app",
+    data(){
+        return {
+            name:"zs"
+        }
+    }
+})
+setTimeout(()=>{
+    vm.name = 'ls'
+},1000)
+</script>
 </html>
-<script src="./vue.js"></script>

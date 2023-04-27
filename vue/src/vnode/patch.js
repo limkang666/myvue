@@ -127,7 +127,7 @@ function updateChildren (el,oldChildren,newChildren){
             newEndVnode = newChildren[--newEndVnode]
         }else if(isSameVNode(oldEndVnode,newStartVnode)){
             patchVNode(oldEndVnode,newStartVnode)
-            el.insertBefore(oldEndVnode.el,oldStartVnode.el)
+            el.insertBefore(oldEndVnode.el,newStartVnode.el)
             oldEndVnode = oldChildren[--oldEndIndex]
             newStartVnode = newChildren[++newStartIndex]
 
